@@ -73,6 +73,8 @@ Or install it yourself as:
      
 5. Then you will receive a callback about payment attempt(callback is configured at yandex site).
 
+    You can use `Yaka.yandex_ip?(ip)` to check remote ip of received request to avoid scams and cheatings.
+    
 
 ## Development
 
