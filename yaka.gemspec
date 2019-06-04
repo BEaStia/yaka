@@ -39,9 +39,10 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", "~> 1.17"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"
+  spec.add_development_dependency "webmock"
   spec.add_dependency "pry"
   spec.add_dependency 'dry-configurable'
   spec.add_dependency 'oj'
   spec.add_dependency 'faraday'
-  spec.add_dependency 'faker'
+  spec.add_development_dependency 'faker'
 end

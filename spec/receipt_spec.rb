@@ -12,7 +12,7 @@ RSpec.describe Yaka::Receipt do
     context 'with phone' do
       subject { described_class.new(items: [receipt_item], phone: phone).to_json }
       it 'should make json' do
-        p subject
+        expect(subject).to eq({items: [receipt_item], phone: phone}.to_json)
       end
     end
   end

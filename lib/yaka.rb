@@ -19,7 +19,5 @@ module Yaka
 
   setting :private_key, 'ololo'
 
-  setting :redirect_url, 'example.com/callbacks'
-
   extend ClassMethods
 end

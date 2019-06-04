@@ -9,7 +9,7 @@ module Yaka
     attr_accessor(*REQUIRED_FIELDS)
     attr_accessor(*OPTIONAL_FIELDS)
 
-    def initialize(amount:, client_ip: nil, description: nil, metadata: nil, receipt: nil, payment_token: nil, confirmation: { type: "redirect", return_url: Yaka.config.redirect_url}, capture: true)
+    def initialize(amount:, client_ip: nil, description: nil, metadata: nil, receipt: nil, payment_token: nil, confirmation: { type: "redirect", return_url: "http://example.com"}, capture: true)
       @amount = amount
       @receipt = receipt
       @description = description
