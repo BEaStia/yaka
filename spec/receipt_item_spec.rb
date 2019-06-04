@@ -2,7 +2,7 @@
 
 RSpec.describe Yaka::ReceiptItem do
   describe '#to_json' do
-    let(:name) { Faker::Pokemon.name }
+    let(:name) { Faker::Games::Pokemon.name }
     let(:quantity) { 5 }
     let(:price) { Yaka::Amount.new(value: 199, currency: 'RUB') }
     let(:vat_code) { 5 }

@@ -2,25 +2,34 @@
 
 module Yaka
   module ClassMethods
-    HOST_URL = 'https://payment.yandex.net'
-    PAYMENTS_URL = '/api/v3/payments'
-
     def publish_payment(payment, token = nil)
       raise Yaka::Error, 'Only payment should be sent to API' unless payment.is_a?(Yaka::Payment)
 
       data = payment.to_json
 
-      conn = Faraday.new(url: HOST_URL) # create a new Connection with base URL
+      conn = Faraday.new(url: Yaka::HOST_URL) # create a new Connection with base URL
       conn.basic_auth(Yaka.config.shop_id, Yaka.config.private_key) # set the Authentication header
 
       @result = conn.post do |req|
-        req.url PAYMENTS_URL
+        req.url Yaka::PAYMENTS_URL
         req.headers['Content-Type'] = 'application/json'
         req.headers['Idempotence-Key'] = token
         req.body = data
       end
 
       JSON.parse(@result.body)
+    end
+
+    def yandex_ip?(ip)
+      addr = IPAddr.new(ip)
+
+      if addr.ipv4?
+        Yaka::ALLOWED_YANDEX_V4_MASKS.any? { |mask, length| addr.mask(length) == mask }
+      elsif addr.ipv6?
+        Yaka::ALLOWED_YANDEX_V6_MASKS.any? { |mask, length| addr.mask(length) == mask }
+      else
+        raise Yaka::Error, 'Invalid request ip address'
+      end
     end
   end
 end
