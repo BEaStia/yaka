@@ -1,36 +1,39 @@
+# frozen_string_literal: true
+
 RSpec.describe Yaka do
-  it "has a version number" do
+  it 'has a version number' do
     expect(Yaka::VERSION).not_to be nil
   end
 
-  it "has publish method" do
+  it 'has publish method' do
     expect(Yaka.respond_to?(:publish_payment)).to be_truthy
   end
 
   describe '.publish_payment' do
-    let(:amount) {Yaka::Amount.new(value: "200.0")}
-    let(:payment) {Yaka::Payment.new(amount: amount)}
-    let(:account_id) {Faker::Number.number(6).to_s}
-    let(:transaction_id) {SecureRandom.uuid}
-    let(:gateway_id) {Faker::Number.number(8).to_s}
-    let(:response) {{"id" => transaction_id, "status" => "succeeded", "paid" => true, "amount" => {"value" => "100.00", "currency" => "RUB"}, "authorization_details" => {"rrn" => gateway_id, "auth_code" => account_id}, "captured_at" => "2019-06-04T07:50:45.577Z", "created_at" => "2019-06-04T07:50:42.913Z", "description" => Faker::Movies::HarryPotter.quote, "metadata" => {}, "payment_method" => {"type" => "bank_card", "id" => transaction_id, "saved" => false, "card" => {"first6" => "555555", "last4" => "4444", "expiry_month" => "09", "expiry_year" => "2019", "card_type" => "MasterCard"}, "title" => "Bank card *4444"}, "recipient" => {"account_id" => account_id, "gateway_id" => gateway_id}, "refundable" => true, "refunded_amount" => {"value" => "0.00", "currency" => "RUB"}, "test" => true}.to_json}
+    let(:amount) { { value: '200.0', currency: 'RUB' } }
+    let(:payment_token) { SecureRandom.uuid }
+    let(:payment) { Yaka::Payment.new(amount: amount, confirmation: { return_url: 'http://example.com' }, description: 'First payment', payment_token: payment_token, metadata: {}, client_ip: '127.0.0.1') }
+    let(:account_id) { Faker::Number.number(6).to_s }
+    let(:phone) { Faker::PhoneNumber.phone_number }
+    let(:transaction_id) { SecureRandom.uuid }
+    let(:gateway_id) { Faker::Number.number(8).to_s }
+    let(:response) { { 'id' => transaction_id, 'status' => 'succeeded', 'paid' => true, 'amount' => { 'value' => '100.00', 'currency' => 'RUB' }, 'authorization_details' => { 'rrn' => gateway_id, 'auth_code' => account_id }, 'captured_at' => '2019-06-04T07:50:45.577Z', 'created_at' => '2019-06-04T07:50:42.913Z', 'description' => Faker::Movies::HarryPotter.quote, 'metadata' => {}, 'payment_method' => { 'type' => 'bank_card', 'id' => transaction_id, 'saved' => false, 'card' => { 'first6' => '555555', 'last4' => '4444', 'expiry_month' => '09', 'expiry_year' => '2019', 'card_type' => 'MasterCard' }, 'title' => 'Bank card *4444' }, 'recipient' => { 'account_id' => account_id, 'gateway_id' => gateway_id }, 'refundable' => true, 'refunded_amount' => { 'value' => '0.00', 'currency' => 'RUB' }, 'test' => true }.to_json }
 
     before do
-      stub_request(:post, "#{Yaka::HOST_URL}#{Yaka::PAYMENTS_URL}").
-          with(
-              body: "{\"amount\":{\"value\":\"200.0\",\"currency\":\"RUB\"},\"confirmation\":{\"type\":\"redirect\",\"return_url\":\"http://example.com\"},\"capture\":true}",
-              headers: {
-                  'Accept' => '*/*',
-                  'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-                  'Authorization' => 'Basic MTIzMTIzLmNlcjpvbG9sbw==',
-                  'Content-Type' => 'application/json',
-                  'User-Agent' => 'Faraday v0.15.4'
-              }).
-          to_return(status: 200, body: response, headers: {"Content-Type" => "application/json"})
-
+      stub_request(:post, 'https://payment.yandex.net/api/v3/payments')
+        .with(
+          body: "{\"amount\":{\"value\":\"200.0\",\"currency\":\"RUB\"},\"confirmation\":{\"return_url\":\"http://example.com\",\"type\":\"redirect\"},\"description\":\"First payment\",\"payment_token\":\"#{payment_token}\",\"metadata\":{},\"client_ip\":\"127.0.0.1\",\"capture\":true}",
+          headers: {
+            'Accept' => '*/*',
+            'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+            'Authorization' => 'Basic MTIzMTIzLmNlcjpvbG9sbw==',
+            'Content-Type' => 'application/json',
+            'User-Agent' => 'Faraday v0.15.4'
+          }
+        ).to_return(status: 200, body: response, headers: { 'Content-Type' => 'application/json' })
     end
 
-    subject {Yaka.publish_payment(payment)}
+    subject { Yaka.publish_payment(payment) }
 
     it 'does not raise exception' do
       expect { subject }.not_to raise_exception

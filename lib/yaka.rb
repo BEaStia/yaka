@@ -1,15 +1,17 @@
 # frozen_string_literal: true
 
 require 'dry-configurable'
+require 'dry-struct'
+require 'ipaddr'
+require 'date'
+
 require 'yaka/version'
-require 'yaka/serializable_object'
-require 'yaka/amount'
+require 'yaka/basic_struct'
 require 'yaka/class_methods'
 require 'yaka/payment'
-require 'yaka/receipt'
-require 'yaka/receipt_item'
+require 'yaka/payment_response'
+
 require 'faraday'
-require 'ipaddr'
 
 module Yaka
   HOST_URL = 'https://payment.yandex.net'

@@ -20,7 +20,59 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+1. Attach gem for your project
+2. Create initializer for your project that will set `shop_id` and `private_key`.
+    ```ruby
+    # yaka.rb
+     
+    Yaka.config.shop_id = ENV['YANDEX_SHOP_ID']
+    Yaka.config.private_key = ENV['YANDEX_PRIVATE_KEY']
+    ```
+3. Create payment at client side:
+    ```html
+        <script src="https://static.yandex.net/checkout/js/v1/"></script>
+         <script src="https://static.yandex.net/checkout/ui/v1/"></script>
+         <button class="btn" onclick="$checkout.open()">Pay 100</button>
+         <script>
+           const $checkout = YandexCheckoutUI(<%= Yaka.config.shop_id %>, {amount: 100});
+           $checkout.on('yc_success', function(response) {
+             $.ajax({
+               url: "/route_for_yandex_kassa",
+               type: 'POST',
+               dataType: "json",
+               contentType: "application/json; charset=utf-8",
+               data: JSON.stringify({
+                 redirect_url: 'https://example.com',
+                 token: response.data.response.paymentToken,
+                 amount: 100,
+                 json_data: {ololo: 4}
+               })
+             }).then(x => {
+                 if (x.status === "succeeded") {
+                   $checkout.chargeSuccessful();
+                 } else {
+                   if (x.status === "pending") {
+                     window.location = x.confirmation.confirmation_url;
+                   } else {
+                     $checkout.chargeFailful();
+                   }
+                 }
+               }
+             );
+           });
+    ```
+4. Create payment at backend side:
+    
+    Token is received from front-end(`token` from the code above).
+    ```ruby
+    payment = Yaka::Payment.new(amount: params[:amount], description: "Пополнение счета через карту", payment_token: params[:token], metadata: params[:json_data], client_ip: request.remote_ip, confirmation: { type: "redirect", return_url: params[:redirect_url]})
+    response = Yaka.publish_payment(payment, SecureRandom.uuid)
+    ```
+    If payment is successful - you will receive status `succeeded`. 
+    If pending - in `confirmation.confirmation_url` you will have a 3ds confirmation URL. Use it!
+     
+5. Then you will receive a callback about payment attempt(callback is configured at yandex site).
+
 
 ## Development
 

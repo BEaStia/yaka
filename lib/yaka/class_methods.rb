@@ -2,8 +2,8 @@
 
 module Yaka
   module ClassMethods
-    def publish_payment(payment, token = nil)
-      raise Yaka::Error, 'Only payment should be sent to API' unless payment.is_a?(Yaka::Payment)
+    def publish_payment(data, token = nil)
+      payment = data.is_a?(Yaka::Payment) ? data : Yaka::Payment.new(data)
 
       data = payment.to_json
 
@@ -17,7 +17,7 @@ module Yaka
         req.body = data
       end
 
-      JSON.parse(@result.body)
+      Yaka::PaymentResponse.new(JSON.parse(@result.body))
     end
 
     def yandex_ip?(ip)
