@@ -11,20 +11,20 @@ module Yaka
       attribute :value, Types::String
       attribute :currency, Types::String
     end
-    attribute :authorization_details, BasicStruct do
+    attribute :authorization_details, BasicStruct.meta(omittable: true) do
       attribute :rrn, Types::String
       attribute :auth_code, Types::String
     end
-    attribute :captured_at, Types::DateTime
+    attribute :captured_at, Types::DateTime.meta(omittable: true)
     attribute :created_at, Types::DateTime
     attribute :description, Types::String
     attribute :metadata, Types::Hash
     attribute :payment_method, BasicStruct do
       attribute :id, Types::String
       attribute :type, Types::String
-      attribute :saved, Types::String
-      attribute :title, Types::String
-      attribute :card, BasicStruct do
+      attribute :saved, Types::String.meta(omittable: true)
+      attribute :title, Types::String.meta(omittable: true)
+      attribute :card, BasicStruct.meta(omittable: true) do
         attribute :first6, Types::String
         attribute :last4, Types::String
         attribute :expiry_month, Types::String
@@ -37,7 +37,7 @@ module Yaka
       attribute :gateway_id, Types::String
     end
     attribute :refundable, Types::Bool
-    attribute :refunded_amount, BasicStruct do
+    attribute :refunded_amount, BasicStruct.meta(omittable: true) do
       attribute :value, Types::String
       attribute :currency, Types::String
     end

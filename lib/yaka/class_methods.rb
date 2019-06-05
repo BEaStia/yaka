@@ -3,10 +3,6 @@
 module Yaka
   module ClassMethods
     def publish_payment(data, token = nil)
-      payment = data.is_a?(Yaka::Payment) ? data : Yaka::Payment.new(data)
-
-      data = payment.to_json
-
       conn = Faraday.new(url: Yaka::HOST_URL) # create a new Connection with base URL
       conn.basic_auth(Yaka.config.shop_id, Yaka.config.private_key) # set the Authentication header
 
@@ -14,10 +10,13 @@ module Yaka
         req.url Yaka::PAYMENTS_URL
         req.headers['Content-Type'] = 'application/json'
         req.headers['Idempotence-Key'] = token
-        req.body = data
+        req.body = data.to_json
       end
 
-      Yaka::PaymentResponse.new(JSON.parse(@result.body))
+      body = JSON.parse(@result.body)
+      raise Yaka::Error, body['description'] if body.dig('code').to_s.include?('error')
+
+      body
     end
 
     def yandex_ip?(ip)
