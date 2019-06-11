@@ -54,8 +54,8 @@ module Yaka
         attribute :payment_mode, Types::Strict::String.meta(omittable: true) # https://kassa.yandex.ru/developers/payments/54fz#54fz-payment-mode
         attribute :payment_subject, PAYMENT_SUBJECTS.meta(omittable: true)
       end
-      attribute :phone, Types::String.meta(omittable: true)
-      attribute :email, Types::String.meta(omittable: true)
+      attribute :phone, Types::String.meta(omittable: true).optional
+      attribute :email, Types::String.meta(omittable: true).optional
       attribute :tax_system_code, Types::String.meta(omittable: true) # https://kassa.yandex.ru/developers/payments/54fz#54fz-tax-systems
     end
     attribute :payment_token, Types::String.meta(omittable: true)

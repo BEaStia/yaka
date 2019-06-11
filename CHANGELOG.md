@@ -1,3 +1,9 @@
+# 1.0.2
+* Fix for empty email/phone for creating receipt
+
+# 1.0.1
+* Disable force wrappers
+
 # 1.0.0
 Breaking changes
 * Simplified class model
