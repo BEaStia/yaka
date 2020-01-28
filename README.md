@@ -65,7 +65,12 @@ Or install it yourself as:
     
     Token is received from front-end(`token` from the code above).
     ```ruby
-    payment = Yaka::Payment.new(amount: params[:amount], description: "Пополнение счета через карту", payment_token: params[:token], metadata: params[:json_data], client_ip: request.remote_ip, confirmation: { type: "redirect", return_url: params[:redirect_url]})
+    payment = Yaka::Payment.new(
+      amount: Yaka::Payment::Amount.new(value: params[:amount], currency: 'USD'),
+      description: "Пополнение счета через карту", payment_token: params[:token], 
+      metadata: params[:json_data], client_ip: request.remote_ip, 
+      confirmation: { type: "redirect", return_url: params[:redirect_url]})
+      
     response = Yaka.publish_payment(payment, SecureRandom.uuid)
     ```
     If payment is successful - you will receive status `succeeded`. 
